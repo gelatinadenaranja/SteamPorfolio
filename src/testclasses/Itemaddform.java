@@ -1,4 +1,4 @@
-package files;
+package testclasses;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
