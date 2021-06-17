@@ -58,7 +58,6 @@ public class MainForm {
 	private ButtonColumn btn_col;
 	private JTextField add_new_item;
 	
-	
 	//Settings variables
 	private static Settings setting;
 	private static int first_run;
@@ -137,7 +136,7 @@ public class MainForm {
 		JPanel panelinfo = new JPanel();
 		panelinfo.setPreferredSize(new Dimension(10, 40));
 		panelinfo.setBackground(SystemColor.controlShadow);
-		//frame.getContentPane().add(panelinfo, BorderLayout.SOUTH);//This adds the panelinfo.--------------Uncomment later-----------------------
+		frame.getContentPane().add(panelinfo, BorderLayout.SOUTH);
 		panelinfo.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		final JLabel lblCurrency = new JLabel("Currency: ");
@@ -170,13 +169,6 @@ public class MainForm {
 		lblTotalprofit.setForeground(Color.BLACK);
 		lblTotalprofit.setFont(new Font("Arial", Font.PLAIN, 12));
 		panelinfo.add(lblTotalprofit);
-		
-		//EXTRA STUFF DELETE AFTER PICKING REFRESH BUTTON POS
-		
-		JButton boton_r = new JButton("ola");
-		menuBar.add(boton_r);
-		
-		//EXTRA STUFF DELETE AFTER PICKING REFRESH BUTTON POS
 		
 		final DefaultTableModel table_model = new DefaultTableModel();
 		table_model.addColumn("");
@@ -247,15 +239,15 @@ public class MainForm {
 		frame.getContentPane().add(scroll_pane);
 		scroll_pane.setColumnHeader(new JViewport() {
 	        @Override public Dimension getPreferredSize() {
-	          Dimension d = new Dimension(0,40);
-	          return d;
+	          Dimension dim = new Dimension(0,40);
+	          return dim;
 	        }
 	    });
 		
 		
 		//After all the UI elements have been initialized, retrieve saved data from db and insert it in the JTable.
 		ArrayList<ArrayList<String>> table_row_list = new ArrayList<ArrayList<String>>();
-		table_row_list = get_database_data(); //Get data from db and store it into a list.
+		table_row_list = get_database_data(); //Get data from db and store it into lists.
 		
 		for(ArrayList<String> element : table_row_list) { //Read the list and add the table rows with the obtained data.
 			ImageIcon icon;
@@ -416,7 +408,6 @@ public class MainForm {
 							item_median_price,
 							item_volume});
 				}
-				System.out.println(item_name_count);
 				add_new_item.setVisible(false);
 		   }
 		});
@@ -450,7 +441,7 @@ public class MainForm {
 		return new ImageIcon(getClass().getResource("/images/Default_Item_Icon.png"));
 	}
 	
-	private String profit_calc(double cost, String price_val){
+	private String profit_calc(double cost, String price_param){
 		if(cost == 0){
 			return "Infinite";
 		}
@@ -458,8 +449,8 @@ public class MainForm {
 		double profit_value;
 		double price;
 		
-		price_val = price_val.replaceAll("[^\\d.]", "");
-		price = Double.parseDouble(price_val);
+		price_param = price_param.replaceAll("[^\\d.]", "");
+		price = Double.parseDouble(price_param);
 		
 		cost = add_tax(cost);
 		
@@ -504,8 +495,7 @@ public class MainForm {
 		}
 		
 		if(obj.get("success").toString().equals("false")) {
-			//The notice has been commented out because too many of these would be annoying in the long run. Will try to use colors instead.
-			//JOptionPane.showMessageDialog(null, "Couldn't get the item's market data.");
+			JOptionPane.showMessageDialog(null, "Couldn't get the item's market data.");
 			values[0] = "None";
 			values[1] = "None";
 			values[2] = "None";
@@ -534,6 +524,8 @@ public class MainForm {
 		ArrayList<ArrayList<String>> row_list = new ArrayList<ArrayList<String>>();
 		ArrayList<String> row;
 		
+		ArrayList<String[]> stored_market_data = new ArrayList<String[]>(); //Usage: (market_hash_name, game_id, lowest_price, median_price, volume)
+		
 		int id;
 		String name;
 		int name_count;
@@ -545,11 +537,11 @@ public class MainForm {
 		String game_id;
 		String market_hash_name;
 		String[] market_data;
-		String lowest_price;
-		String median_price;
-		String volume;
+		String lowest_price = "";
+		String median_price = "";
+		String volume = "";
 		
-		ResultSet data = database_manager.query_data();;
+		ResultSet data = database_manager.query_data();
 		
 		try {
 			if(data.next()) {
@@ -565,11 +557,29 @@ public class MainForm {
 					game_id = data.getString("game_id");
 					market_hash_name = data.getString("market_hash_name");
 					
-					//Get item market data
-					market_data = get_item_market_data(game_id, market_hash_name);
-					lowest_price = market_data[0];
-					median_price = market_data[1];
-					volume = market_data[2];
+					//Check if the current market_hash_name and game_id had already been used.
+					//If so just loop through stored data until a match is found and grab the stored data.
+					boolean found_match = false;
+					for(String[] element : stored_market_data) {
+						if(element[0].equals(market_hash_name) && element[1].equals(game_id)) {
+							found_match = true;
+							lowest_price = element[2];
+							median_price = element[3];
+							volume = element[4];
+							break;
+						}
+					}
+					
+					//Get item market data if it hasn't already been gotten.
+					if(found_match == false) {
+						market_data = get_item_market_data(game_id, market_hash_name);
+						lowest_price = market_data[0];
+						median_price = market_data[1];
+						volume = market_data[2];
+						
+						//Store the new data
+						stored_market_data.add(new String[] {market_hash_name, game_id, lowest_price, median_price, volume});
+					}
 					
 					profit = profit_calc(cost, lowest_price);
 					expected_value = add_tax(expected_value);
