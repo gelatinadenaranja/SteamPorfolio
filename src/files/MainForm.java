@@ -128,6 +128,10 @@ public class MainForm {
 		mnItem.add(mntmRemoveItem);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
+		JButton btn_refresh = new JButton("Refresh");
+		btn_refresh.setForeground(Color.BLACK);
+		menuBar.add(btn_refresh);
+		
 		add_new_item = new JTextField("Adding item...");
 		add_new_item.setEditable(false);
 		add_new_item.setVisible(false);
@@ -323,7 +327,7 @@ public class MainForm {
 			}
 		});
 		
-		add_new_item.addFocusListener(new FocusAdapter() {
+		add_new_item.addFocusListener(new FocusAdapter() { //Add item to JTable and save data.
 			@Override
 			public void focusGained(FocusEvent e) {
 				int item_id;
@@ -339,10 +343,10 @@ public class MainForm {
 				ImageIcon item_icon;
 				String icon_URL;
 				String[] item_market_data;
-				String item_lowest_price;
-				String item_median_price;
-				String item_volume;
-				String item_profit;
+				String item_lowest_price = "";
+				String item_median_price = "";
+				String item_volume = "";
+				String item_profit = "";
 				
 				//Get pop-up form data.
 				item_name = additempopup_object.get_item_name();
@@ -411,6 +415,108 @@ public class MainForm {
 				add_new_item.setVisible(false);
 		   }
 		});
+		
+		btn_refresh.addMouseListener(new MouseAdapter() { //Refresh item market data.
+			@Override
+			public void mousePressed(MouseEvent e) {
+				
+				ArrayList<String[]> market_data = new ArrayList<String[]>(); //Usage: (hash_name, game_id, lowest_price, median_price, volume)
+				
+				String hash_name;
+				String game_id;
+				String item_id;
+				String lowest_price = "";
+				String median_price = "";
+				String volume = "";
+				double item_cost = 0;
+				String item_name = "";
+				int item_row;
+				Boolean match;
+				
+				ResultSet data;
+				
+				data = database_manager.get_refresh_data();
+				
+				try {
+					if(data.next()) {
+						do {
+							item_row = -1;
+							
+							hash_name = data.getString("market_hash_name");
+							game_id = data.getString("game_id");
+							item_id = data.getString("id");
+							
+							
+							//Check if data has been gotten.
+							match = false;
+							for(String[] element : market_data) {
+								if(element[0].equals(hash_name) && element[1].equals(game_id)) {
+									match = true;
+									lowest_price = element[2];
+									median_price = element[3];
+									volume = element[4];
+									break;
+								}
+							}
+							
+							//Get market data if it wasn't in the list.
+							if(match == false) {
+								String[] item_market_data;
+								
+								item_market_data = get_item_market_data(game_id, hash_name);
+								lowest_price = item_market_data[0];
+								median_price = item_market_data[1];
+								volume = item_market_data[2];
+								
+								//Store data
+								market_data.add(new String[] {hash_name, game_id, lowest_price, median_price, volume});
+							}
+							
+							//Find the item's name in the itemname_id_list map by id. (This is the name used in the JTable)
+							for(Map.Entry<String, String> map : itemname_id_list.entrySet()) {
+								if(item_id.equals(map.getValue())) {
+									item_name = map.getKey();
+									break;
+								}
+							}
+							
+							//Find the item's row.
+							int index;
+							for(index = 0; index < table_model.getRowCount(); index++) {
+								if(item_name.equals(table_model.getValueAt(index, 1))) {
+									item_row = index;
+									break;
+								}
+							}
+							
+							//Calculate new profit value.
+							try {
+								item_cost = Double.parseDouble(table_model.getValueAt(item_row, 4).toString());
+							} catch(NumberFormatException ex) {
+								item_cost = 0;
+							}
+							
+							
+							String item_profit = profit_calc(item_cost, lowest_price);
+							
+							//Insert the new data into the cells.
+							if (item_row > -1) {
+								table_model.setValueAt(item_profit, item_row, 4);
+								table_model.setValueAt(lowest_price, item_row, 6);
+								table_model.setValueAt(median_price, item_row, 7);
+								table_model.setValueAt(volume, item_row, 8);
+								
+							}
+						} while(data.next());
+					}
+					data.close();
+				} catch(SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Something happened while trying to read data from the database.\n" + ex.toString());
+				}
+			}
+		});
+		
+		
 		
 	}
 	
@@ -602,8 +708,8 @@ public class MainForm {
 					
 					row_list.add(row);
 				} while (data.next());
-				data.close();
 			}
+			data.close();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Something happened while reading the data from the database.\n" + e.toString());
 			e.printStackTrace();

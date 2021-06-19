@@ -25,7 +25,7 @@ public class Dbconnector {
 	
 	public int insert_new_item(String name, int name_count, String market_link, String game_id, String market_hash_name, String iconURL,
 			                    double cost, int quantity, double expected_value,
-			                    String last_lowest_price, String last_median_price, String last_volume){
+			                    String last_lowest_price, String last_median_price, String last_volume) {
 		Statement statement = null;
 		PreparedStatement prep_statement;
 		ResultSet result;
@@ -79,8 +79,10 @@ public class Dbconnector {
 		PreparedStatement prep_statement;
 		ResultSet result;
 		
+		String query = "SELECT name_count FROM item_data WHERE(name=?) ORDER BY name_count;";
+		
 		try{
-			prep_statement = conn.prepareStatement("SELECT name_count FROM item_data WHERE(name=?) ORDER BY name_count;");
+			prep_statement = conn.prepareStatement(query);
 			prep_statement.setString(1, name);
 			
 			result = prep_statement.executeQuery();
@@ -113,23 +115,25 @@ public class Dbconnector {
 		//Maybe normalize someday.
 		Statement statement = null;
 		
+		String query = "CREATE TABLE IF NOT EXISTS item_data(" +
+			   	"id INT NOT NULL," +
+				"name TEXT NOT NULL," +
+				"name_count INT NOT NULL," +
+				"market_link TEXT NOT NULL," +
+				"game_id TEXT NOT NULL," +
+				"market_hash_name TEXT NOT NULL," +
+				"cost REAL NOT NULL," +
+				"quantity INT NOT NULL," +
+				"expected_value REAL NOT NULL," +
+				"last_lowest_price TEXT NOT NULL," +
+				"last_median_price TEXT NOT NULL," +
+				"last_volume TEXT NOT NULL," +
+				"iconURL TEXT," +
+				"PRIMARY KEY(id));";
+		
 		try{
 			statement = conn.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS item_data(" +
-			"id INT NOT NULL," +
-			"name TEXT NOT NULL," +
-			"name_count INT NOT NULL," +
-			"market_link TEXT NOT NULL," +
-			"game_id TEXT NOT NULL," +
-			"market_hash_name TEXT NOT NULL," +
-			"cost REAL NOT NULL," +
-			"quantity INT NOT NULL," +
-			"expected_value REAL NOT NULL," +
-			"last_lowest_price TEXT NOT NULL," +
-			"last_median_price TEXT NOT NULL," +
-			"last_volume TEXT NOT NULL," +
-			"iconURL TEXT," +
-			"PRIMARY KEY(id));");
+			statement.executeUpdate(query);
 			statement.close();
 			return true;
 		} catch(SQLException e) {
@@ -154,12 +158,29 @@ public class Dbconnector {
 		}
 	}
 	
-	public ResultSet query_data(){
+	public ResultSet query_data() {
 		PreparedStatement prep_statement;
-		String query = "SELECT id, name, name_count, quantity, cost, iconURL, expected_value, game_id, market_hash_name FROM item_data;";
 		ResultSet result;
 		
+		String query = "SELECT id, name, name_count, quantity, cost, iconURL, expected_value, game_id, market_hash_name FROM item_data;";
+		
 		try{
+			prep_statement = conn.prepareStatement(query);
+			result = prep_statement.executeQuery();
+			return result;
+		} catch(SQLException e) {
+			JOptionPane.showMessageDialog(null, "Couldn't retrieve data from database.\n" + e.toString());
+			return null;
+		}
+	}
+	
+	public ResultSet get_refresh_data() {
+		PreparedStatement prep_statement;
+		ResultSet result;
+		
+		String query = "SELECT id, market_hash_name, game_id FROM item_data;";
+		
+		try {
 			prep_statement = conn.prepareStatement(query);
 			result = prep_statement.executeQuery();
 			return result;
