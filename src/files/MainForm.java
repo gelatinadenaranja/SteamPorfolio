@@ -118,6 +118,10 @@ public class MainForm {
 		mnItem.setForeground(Color.BLACK);
 		menuBar.add(mnItem);
 		
+		JMenu mnSetting = new JMenu("Settings");
+		mnSetting.setForeground(Color.BLACK);
+		menuBar.add(mnSetting);
+		
 		JMenuItem mntmAddItem = new JMenuItem("Add item");
 		mntmAddItem.setFont(new Font("Arial", Font.PLAIN, 12));
 		mntmAddItem.setIcon(null);
@@ -126,6 +130,11 @@ public class MainForm {
 		JMenuItem mntmRemoveItem = new JMenuItem("Remove item");
 		mntmRemoveItem.setFont(new Font("Arial", Font.PLAIN, 12));
 		mnItem.add(mntmRemoveItem);
+		
+		JMenuItem mntmChangeCurrency = new JMenuItem("Change currency");
+		mntmRemoveItem.setFont(new Font("Arial", Font.PLAIN, 12));
+		mnSetting.add(mntmChangeCurrency);
+		
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JButton btn_refresh = new JButton("Refresh");
@@ -327,6 +336,23 @@ public class MainForm {
 			}
 		});
 		
+		mntmChangeCurrency.addMouseListener(new MouseAdapter() { //Change currency
+			public void mousePressed(MouseEvent e) {
+				String current_currency_name = setting.get_currency_name();
+				String new_currency_name;
+				
+				setting.change_currency(frame);
+				
+				new_currency_name = setting.get_currency_name();
+				
+				if((new_currency_name != null) && (!new_currency_name.equals(current_currency_name))) {
+					currency = setting.get_currency();
+					lblCurrency.setText("Currency: " + setting.get_currency_name());
+					JOptionPane.showMessageDialog(frame, "Click the Refresh button for change to make effect.");
+				}
+			}
+		});
+		
 		add_new_item.addFocusListener(new FocusAdapter() { //Add item to JTable and save data.
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -491,12 +517,10 @@ public class MainForm {
 							
 							//Calculate new profit value.
 							try {
-								item_cost = Double.parseDouble(table_model.getValueAt(item_row, 4).toString());
+								item_cost = Double.parseDouble(table_model.getValueAt(item_row, 3).toString());
 							} catch(NumberFormatException ex) {
 								item_cost = 0;
 							}
-							
-							
 							String item_profit = profit_calc(item_cost, lowest_price);
 							
 							//Insert the new data into the cells.
@@ -505,7 +529,6 @@ public class MainForm {
 								table_model.setValueAt(lowest_price, item_row, 6);
 								table_model.setValueAt(median_price, item_row, 7);
 								table_model.setValueAt(volume, item_row, 8);
-								
 							}
 						} while(data.next());
 					}
