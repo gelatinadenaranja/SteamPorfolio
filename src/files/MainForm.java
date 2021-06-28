@@ -37,6 +37,8 @@ import org.jsoup.UncheckedIOException;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
@@ -60,7 +62,6 @@ public class MainForm {
 	
 	//Settings variables
 	private static Settings setting;
-	private static int first_run;
 	private static int profit_mode;
 	private static int currency;
 	
@@ -74,10 +75,8 @@ public class MainForm {
 		itemname_id_list = new TreeMap<String, String>();
 		
 		setting = new Settings();
-		setting.create_directories();
 		profit_mode = setting.get_profit_mode();
 		currency = setting.get_currency();
-		first_run = setting.get_first_run(); //Not sure if this setting will be used at all -yet-
 		
 		database_manager = new Dbconnector();
 		database_manager.create_tables();
@@ -152,7 +151,7 @@ public class MainForm {
 		frame.getContentPane().add(panelinfo, BorderLayout.SOUTH);
 		panelinfo.setLayout(new GridLayout(1, 0, 0, 0));
 		
-		final JLabel lblCurrency = new JLabel("Currency: ");
+		final JLabel lblCurrency = new JLabel("Currency: " + setting.get_currency_name());
 		lblCurrency.setBorder(new LineBorder(Color.BLACK, 2));
 		lblCurrency.setForeground(Color.BLACK);
 		lblCurrency.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -289,8 +288,16 @@ public class MainForm {
 			itemname_id_list.put(element.get(1), element.get( element.size() - 1 ));
 		}
 		
+		
 		//Events
-		mntmAddItem.addMouseListener(new MouseAdapter() {//Add item
+		frame.addWindowListener(new WindowAdapter() { //App close
+            @Override
+            public void windowClosing(WindowEvent e) {
+            	setting.save_settings();
+            }
+        });
+		
+		mntmAddItem.addMouseListener(new MouseAdapter() { //Add item
 			public void mousePressed(MouseEvent e) {
 				additempopup_object.set_main_frame_source(frame);
 				additempopup_object.set_add_new_item_trigger(add_new_item);
@@ -299,7 +306,7 @@ public class MainForm {
 			}
 		});
 		
-		mntmRemoveItem.addMouseListener(new MouseAdapter() {//Remove item
+		mntmRemoveItem.addMouseListener(new MouseAdapter() { //Remove item
 			public void mousePressed(MouseEvent e) {
 				
 				//The JOptionPane returns null if the user clicked "Cancel", closed the dialog or triggered this event while the JTable was empty.

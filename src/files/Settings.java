@@ -29,6 +29,7 @@ public class Settings {
 		file = new File(System.getProperty("user.home") + "\\SteamPortfolio\\Settings.donottouch");
 		file.getParentFile().mkdir();
 		
+		create_directories();
 		create_currencies_file();
 		
 		try{
@@ -68,7 +69,7 @@ public class Settings {
 		}
 	}
 	
-	public void create_directories() {
+	private void create_directories() {
 		File icon_folder = new File(System.getProperty("user.home") + "\\SteamPortfolio\\icons");
 		try{
 			icon_folder.mkdirs();
@@ -90,6 +91,24 @@ public class Settings {
 			writer.close();
 		}catch(IOException e){
 			JOptionPane.showMessageDialog(null, "Couldn't write default settings.\n" + e.toString());
+		}
+	}
+	
+	public void save_settings() {
+		File file = new File((System.getProperty("user.home") + "\\SteamPortfolio\\Settings.donottouch"));
+		FileWriter writer;
+		
+		try {
+			writer = new FileWriter(file.getAbsoluteFile(), false);
+			
+			writer.write("first_run=" + first_run + System.lineSeparator() + 
+					     "profit_mode=" + profit_mode + System.lineSeparator() + 
+					     "currency=" + currency + System.lineSeparator() + 
+					     "currency_name=" + currency_name);
+			
+			writer.close();
+		} catch(IOException e) {
+			JOptionPane.showMessageDialog(null, "Couldn't save settings.\n" + e.toString());
 		}
 	}
 	
@@ -139,44 +158,44 @@ public class Settings {
 				writer = new FileWriter(file.getAbsoluteFile(), false);
 				
 				writer.write("1=US dollar" + System.lineSeparator() + 
-						    "2=British pound" + System.lineSeparator() + 
-						    "3=Euro" + System.lineSeparator() + 
-						    "4=Swiss franc" + System.lineSeparator() + 
-						    "5=Russian rubble" + System.lineSeparator() + 
-						    "6=Polish Zloty" + System.lineSeparator() + 
-						    "7=Brazilian real" + System.lineSeparator() + 
-						    "8=Japanese Yen" + System.lineSeparator() + 
-						    "9=Norwegian krone" + System.lineSeparator() + 
-						    "10=Indonesian rupiah" + System.lineSeparator() + 
-						    "11=Malaysian Ringgit" + System.lineSeparator() + 
-						    "12=Philippine peso" + System.lineSeparator() + 
-						    "13=Singapore dollar" + System.lineSeparator() + 
-						    "14=Thai baht" + System.lineSeparator() + 
-						    "15=Vietnamese dong" + System.lineSeparator() + 
-						    "16=South korean won" + System.lineSeparator() + 
-						    "17=Turkish lira" + System.lineSeparator() + 
-						    "18=Ukrainian Hryvnia" + System.lineSeparator() + 
-						    "19=Mexican peso" + System.lineSeparator() + 
-						    "20=Canadian Dollar" + System.lineSeparator() + 
-						    "21=Australian dollar" + System.lineSeparator() + 
-						    "22=New zealand dollar" + System.lineSeparator() + 
-						    "23=Chinese yuan" + System.lineSeparator() + 
-						    "24=Indian rupee" + System.lineSeparator() + 
-						    "25=Chilean peso" + System.lineSeparator() + 
-						    "26=Peruvian nuevo sol" + System.lineSeparator() + 
-						    "27=Colombian peso" + System.lineSeparator() + 
-						    "28=South african rand" + System.lineSeparator() + 
-						    "29=Hong kong dollar" + System.lineSeparator() + 
-						    "30=Taiwan dollar" + System.lineSeparator() + 
-						    "31=Saudi riyal" + System.lineSeparator() + 
-						    "32=Arab emirates dirham" + System.lineSeparator() + 
-						    "34=Argentine peso" + System.lineSeparator() + 
-						    "35=Israeli new shekel" + System.lineSeparator() + 
-						    "37=Kazakhstan tenge" + System.lineSeparator() + 
-						    "38=Kuwaiti dinar" + System.lineSeparator() + 
-						    "39=Qatari rial" + System.lineSeparator() + 
-						    "40=Costa rican Colon" + System.lineSeparator() + 
-						    "41=Uruguayan peso");
+						     "2=British pound" + System.lineSeparator() + 
+						     "3=Euro" + System.lineSeparator() + 
+						     "4=Swiss franc" + System.lineSeparator() + 
+						     "5=Russian rubble" + System.lineSeparator() + 
+						     "6=Polish Zloty" + System.lineSeparator() + 
+						     "7=Brazilian real" + System.lineSeparator() + 
+						     "8=Japanese Yen" + System.lineSeparator() + 
+						     "9=Norwegian krone" + System.lineSeparator() + 
+						     "10=Indonesian rupiah" + System.lineSeparator() + 
+						     "11=Malaysian Ringgit" + System.lineSeparator() + 
+						     "12=Philippine peso" + System.lineSeparator() + 
+						     "13=Singapore dollar" + System.lineSeparator() + 
+						     "14=Thai baht" + System.lineSeparator() + 
+						     "15=Vietnamese dong" + System.lineSeparator() + 
+						     "16=South korean won" + System.lineSeparator() + 
+						     "17=Turkish lira" + System.lineSeparator() + 
+						     "18=Ukrainian Hryvnia" + System.lineSeparator() + 
+						     "19=Mexican peso" + System.lineSeparator() + 
+						     "20=Canadian Dollar" + System.lineSeparator() + 
+						     "21=Australian dollar" + System.lineSeparator() + 
+						     "22=New zealand dollar" + System.lineSeparator() + 
+						     "23=Chinese yuan" + System.lineSeparator() + 
+						     "24=Indian rupee" + System.lineSeparator() + 
+						     "25=Chilean peso" + System.lineSeparator() + 
+						     "26=Peruvian nuevo sol" + System.lineSeparator() + 
+						     "27=Colombian peso" + System.lineSeparator() + 
+						     "28=South african rand" + System.lineSeparator() + 
+						     "29=Hong kong dollar" + System.lineSeparator() + 
+						     "30=Taiwan dollar" + System.lineSeparator() + 
+						     "31=Saudi riyal" + System.lineSeparator() + 
+						     "32=Arab emirates dirham" + System.lineSeparator() + 
+						     "34=Argentine peso" + System.lineSeparator() + 
+						     "35=Israeli new shekel" + System.lineSeparator() + 
+						     "37=Kazakhstan tenge" + System.lineSeparator() + 
+						     "38=Kuwaiti dinar" + System.lineSeparator() + 
+						     "39=Qatari rial" + System.lineSeparator() + 
+						     "40=Costa rican Colon" + System.lineSeparator() + 
+						     "41=Uruguayan peso");
 				
 				writer.close();
 			}
