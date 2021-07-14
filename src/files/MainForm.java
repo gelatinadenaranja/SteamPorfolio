@@ -11,12 +11,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JViewport;
 
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.EventQueue;
 
 import javax.swing.JScrollPane;
@@ -40,13 +38,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.BorderLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -64,6 +59,9 @@ public class MainForm {
 	private DefaultTableModel table_model;
 	private static Additempopup additempopup_object;
 	private static ItemEdit itemedit_object;
+	private JLabel lbl_totalcost;
+	private JLabel lbl_totalvalue;
+	private JLabel lbl_totalprofit;
 	private ButtonColumn btn_col;
 	
 	//Settings variables
@@ -163,25 +161,25 @@ public class MainForm {
 		lblKeyprice.setBackground(SystemColor.menu);
 		lblKeyprice.setFont(new Font("Arial", Font.PLAIN, 12));
 		lblKeyprice.setForeground(Color.BLACK);
-		panelinfo.add(lblKeyprice);
+		//panelinfo.add(lblKeyprice); //Not going to use this for now.
 		
-		JLabel lblTotalcost = new JLabel("Total cost: ");
-		lblTotalcost.setBorder(new LineBorder(Color.BLACK, 2));
-		lblTotalcost.setForeground(Color.BLACK);
-		lblTotalcost.setFont(new Font("Arial", Font.PLAIN, 12));
-		panelinfo.add(lblTotalcost);
+		lbl_totalcost = new JLabel("Total cost: ");
+		lbl_totalcost.setBorder(new LineBorder(Color.BLACK, 2));
+		lbl_totalcost.setForeground(Color.BLACK);
+		lbl_totalcost.setFont(new Font("Arial", Font.PLAIN, 12));
+		panelinfo.add(lbl_totalcost);
 		
-		JLabel lblTotalvalue = new JLabel("Total value: ");
-		lblTotalvalue.setBorder(new LineBorder(Color.BLACK, 2));
-		lblTotalvalue.setForeground(Color.BLACK);
-		lblTotalvalue.setFont(new Font("Arial", Font.PLAIN, 12));
-		panelinfo.add(lblTotalvalue);
+		lbl_totalvalue = new JLabel("Total value: ");
+		lbl_totalvalue.setBorder(new LineBorder(Color.BLACK, 2));
+		lbl_totalvalue.setForeground(Color.BLACK);
+		lbl_totalvalue.setFont(new Font("Arial", Font.PLAIN, 12));
+		panelinfo.add(lbl_totalvalue);
 		
-		JLabel lblTotalprofit = new JLabel("Profit: ");
-		lblTotalprofit.setBorder(new LineBorder(Color.BLACK, 2));
-		lblTotalprofit.setForeground(Color.BLACK);
-		lblTotalprofit.setFont(new Font("Arial", Font.PLAIN, 12));
-		panelinfo.add(lblTotalprofit);
+		lbl_totalprofit = new JLabel("Profit: ");
+		lbl_totalprofit.setBorder(new LineBorder(Color.BLACK, 2));
+		lbl_totalprofit.setForeground(Color.BLACK);
+		lbl_totalprofit.setFont(new Font("Arial", Font.PLAIN, 12));
+		panelinfo.add(lbl_totalprofit);
 		
 		table_model = new DefaultTableModel();
 		table_model.addColumn("");
@@ -210,11 +208,16 @@ public class MainForm {
 			}
 			
 			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
 			public Class getColumnClass(int column) {
-				if(column == 0){
+				switch(column) {
+				case 0:
 					return ImageIcon.class;
+				
+				default:
+					return String.class;
+					//return getValueAt(0, column).getClass(); //Old
 				}
-				return getValueAt(0, column).getClass();
             }
 		};
 		
@@ -276,7 +279,7 @@ public class MainForm {
 			ImageIcon icon;
 			try{
 				if(!(element.get(0) == null)) {
-					icon = new ImageIcon(ImageIO.read(new File(element.get(0)))); //Get the item icon through the icon URL.
+					icon = new ImageIcon( ImageIO.read(new File(element.get(0))) ); //Get the item icon through the icon URL.
 				} else {
 					icon = get_default_icon();
 				}
@@ -299,6 +302,8 @@ public class MainForm {
 			itemname_id_list.put(element.get(1), element.get( element.size() - 1 ));
 		}
 		
+		update_all_totals();
+		
 		//Events
 		frame.addWindowListener(new WindowAdapter() { //App close
 			
@@ -312,10 +317,12 @@ public class MainForm {
 			   public void componentShown(ComponentEvent e) {
 				   
 				   if( additempopup_object.get_task_done() ) {
+					   additempopup_object.set_task_completed();
 					   add_new_item();
 				   }
 				   
 				   if( itemedit_object.get_task_done() ) {
+					   itemedit_object.set_task_completed();
 					   update_item();
 				   }
 			   }
@@ -362,6 +369,7 @@ public class MainForm {
 						
 						table_model.removeRow(row_index);
 						itemname_id_list.remove(selected_item);
+						update_all_totals();
 					}
 				}
 			}
@@ -480,6 +488,8 @@ public class MainForm {
 				} catch(SQLException ex) {
 					JOptionPane.showMessageDialog(null, "Something happened while trying to read data from the database.\n" + ex.toString());
 				}
+				
+				update_all_totals();
 			}
 		});
 		
@@ -569,6 +579,8 @@ public class MainForm {
 					item_lowest_price,
 					item_median_price,
 					item_volume});
+			
+			update_all_totals();
 		}
 	}
 	
@@ -600,7 +612,74 @@ public class MainForm {
 			table_model.setValueAt(new_cost, table_row_num, 3);
 			table_model.setValueAt(new_profit , table_row_num, 4);
 			table_model.setValueAt(new_expectedvalue, table_row_num, 5);
+			
+			update_all_totals();
 		}
+	}
+	//Total value and profit
+	private void update_total_cost() {
+		int quantity = 0;
+		double cost = 0;
+		double total_cost = 0;
+		
+		for(int index = 0; index < table_model.getRowCount(); index++) {
+			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
+			cost = Double.parseDouble( table_model.getValueAt(index, 3).toString() );
+			total_cost = total_cost + (quantity * cost);
+		}
+		
+		lbl_totalcost.setText( "Total cost: " + truncate(total_cost) );
+	}
+	
+	private void update_total_value() {
+		int quantity = 0;
+		double price = 0;
+		double total_value = 0;
+		
+		for(int index = 0; index < table_model.getRowCount(); index++) {
+			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
+			price = Double.parseDouble( table_model.getValueAt(index, 6).toString() );
+			price = price * 0.8695;
+			total_value = total_value + (quantity * price);
+		}
+		
+		lbl_totalvalue.setText( "Total value: " + truncate(total_value) );
+	}
+	
+	private void update_total_profit() {
+		//-----------------------------------------------------------------------------------------------------------------------------------------
+		int quantity = 0;
+		double cost = 0;
+		double total_cost = 0;
+		double price = 0;
+		double total_value = 0;
+		double total_profit = 0;
+		
+		for(int index = 0; index < table_model.getRowCount(); index++) {
+			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
+			cost = Double.parseDouble( table_model.getValueAt(index, 3).toString() );
+			price = Double.parseDouble( table_model.getValueAt(index, 6).toString() );
+			price = price * 0.8695;
+			
+			total_value = total_value + (quantity * price);
+			total_cost = total_cost + (quantity * cost);
+		}
+		
+		total_profit = total_value - total_cost;
+		
+		total_profit = truncate(total_profit);
+		
+		if(total_profit >= 0) {
+			lbl_totalprofit.setText( "Total profit: " + total_profit );
+		} else {
+			lbl_totalprofit.setText( "Total losses: " + total_profit );
+		}
+	}
+	
+	private void update_all_totals() {
+		update_total_cost();
+		update_total_value();
+		update_total_profit();
 	}
 	
 	private double truncate(double value) {
@@ -656,10 +735,9 @@ public class MainForm {
 		}
 	}
 	
-	private static String get_clean_value(String value) {
-		int index;
+	private static String get_clean_number(String value) {
 		
-		for(index = 0; index < value.length(); index++) {
+		for(int index = 0; index < value.length(); index++) {
 			if(value.charAt(index) == ',') {
 				value = value.replace(".", "");
 				value = value.replace(",", ".");
@@ -707,12 +785,12 @@ public class MainForm {
 		
 		if(obj.get("lowest_price") != null){
 			values[0] = obj.get("lowest_price").toString();
-			values[0] = get_clean_value(values[0]);
+			values[0] = get_clean_number(values[0]);
 		}
 		
 		if(obj.get("median_price") != null){
 			values[1] = obj.get("median_price").toString();
-			values[1] = get_clean_value(values[1]);
+			values[1] = get_clean_number(values[1]);
 		}
 		
 		if(obj.get("volume") != null){
