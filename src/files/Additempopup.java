@@ -34,8 +34,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-//Watch out for out of range numeric inputs
-
 public class Additempopup {
 	private JFrame frame = new JFrame();
 	private JPanel panelmain = new JPanel();
@@ -60,10 +58,10 @@ public class Additempopup {
 	private JButton btnaccept = new JButton();
 	private Component horizontalStrut;
 	private JButton btncancel = new JButton();
-	private JFrame main_frame = new JFrame();
-	private JTextField add_new_item_trigger;
+	private JFrame mainform_frame = new JFrame();
 	private JTextField last_focused_field;
 	private BufferedImage item_icon;
+	private boolean task_done;
 	
 	public Additempopup() {
 		java.lang.System.setProperty("https.protocols", "TLSv1.2");
@@ -189,20 +187,19 @@ public class Additempopup {
 		btncancel.setText("Cancel");
 		panelbuttons.add(btncancel);
 		
-		add_new_item_trigger = new JTextField();
-		add_new_item_trigger.setVisible(false);
-		
-		main_frame.setVisible(false);
+		mainform_frame.setVisible(false);
 		
 		last_focused_field = new JTextField();
 		
 		last_valid_link = "";
 		
 		item_icon = null;
+
+		task_done = false;
 		
 		frame.setVisible(false);
 		
-		//EVENTS
+		//Events
 		FocusAdapter setting_number = (new FocusAdapter() {
 			public void focusGained(FocusEvent e) {
 				JTextField source_textfield = (JTextField) e.getSource();
@@ -259,7 +256,6 @@ public class Additempopup {
 			    }
 			}
 		});
-		
 		textitemcost.addFocusListener(doublecheck);
 		textexpectedvalue.addFocusListener(doublecheck);
 		
@@ -377,7 +373,8 @@ public class Additempopup {
 						get_item_name_image();
 						return;
 					}
-					trigger_add_new_item();
+					task_done = true;
+					close_form();
 				}
 			}
 		});
@@ -386,8 +383,7 @@ public class Additempopup {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				reset_fields();
-				main_frame.setEnabled(true);
-				frame.setVisible(false);
+				close_form();
 			}
 		});
 		
@@ -395,8 +391,7 @@ public class Additempopup {
             @Override
             public void windowClosing(WindowEvent e) {
 				reset_fields();
-				main_frame.setEnabled(true);
-				frame.setVisible(false);
+				close_form();
             }
         });
 	}
@@ -409,27 +404,24 @@ public class Additempopup {
 		textitemquantity.setText("0");
 		textexpectedvalue.setText("0");
 		lblitemname.setText("");
+		task_done = false;
 	}
 	
-	public void trigger_add_new_item() {
-		main_frame.setEnabled(true);
+	private void close_form() {
+		mainform_frame.setEnabled(true);
+		mainform_frame.setVisible(true);
 		frame.setVisible(false);
-		add_new_item_trigger.setVisible(true);
-		add_new_item_trigger.requestFocus();
 	}
 	
 	public void set_pop_up_visible() {
-		main_frame.setEnabled(false);
+		mainform_frame.setEnabled(false);
+		mainform_frame.setVisible(false);
 		frame.setVisible(true);
 		frame.requestFocus();
 	}
 	
-	public void set_main_frame_source(JFrame p_frame) {
-		main_frame = p_frame;
-	}
-	
-	public void set_add_new_item_trigger(JTextField p_textfield) {
-		add_new_item_trigger = p_textfield;
+	public void set_main_frame_source(JFrame frame) {
+		mainform_frame = frame;
 	}
 	
 	private void get_item_name_image() {
@@ -499,6 +491,7 @@ public class Additempopup {
 		return name;
 	}
 	
+	//Getters
 	public String get_item_name() {
 		return name_shortener(lblitemname.getText());
 	}
@@ -529,7 +522,7 @@ public class Additempopup {
 		String link = textmarketlink.getText();
 		int i = 0;
 		int last_slash_char = -1;
-		int first_question_mark_char = -1; //This represents the index in which filters start, which we don't want in the resultant string.
+		int first_question_mark_char = -1; //This represents the index in which filters start, which we don't want in the result string.
 		
 		for(i = 0; i < link.length(); i++) {
 			if(link.charAt(i) == '/') {
@@ -563,5 +556,9 @@ public class Additempopup {
 	public BufferedImage get_item_icon() {
 		//May return null
 		return item_icon;
+	}
+	
+	public boolean get_task_done() {
+		return task_done;
 	}
 }

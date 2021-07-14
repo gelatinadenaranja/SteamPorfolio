@@ -153,7 +153,7 @@ public class Dbconnector {
 			
 			return true;
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, "Couln't delete data from database.\n" + e.toString());
+			JOptionPane.showMessageDialog(null, "Couldn't delete data from database.\n" + e.toString());
 			return false;
 		}
 	}
@@ -187,6 +187,21 @@ public class Dbconnector {
 		} catch(SQLException e) {
 			JOptionPane.showMessageDialog(null, "Couldn't retrieve data from database.\n" + e.toString());
 			return null;
+		}
+	}
+	
+	public boolean update_item_data(String id, String cost, String quantity, String expectedvalue) {
+		PreparedStatement prep_statement;
+		
+		String query = "UPDATE item_data SET cost=" + cost + ", quantity=" + quantity + ", expected_value=" + expectedvalue + " WHERE id=" + id;
+		
+		try {
+			prep_statement = conn.prepareStatement(query);
+			prep_statement.executeUpdate();
+			return true;
+		} catch(SQLException e) {
+			JOptionPane.showMessageDialog(null, "Couldn't apply the changes in the database.\n" + e.toString());
+			return false;
 		}
 	}
 	
