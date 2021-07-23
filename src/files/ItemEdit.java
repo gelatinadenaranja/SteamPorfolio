@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -67,8 +65,9 @@ public class ItemEdit {
 		frame.getContentPane().add(panel_center, BorderLayout.CENTER);
 		panel_center.setLayout(new BoxLayout(panel_center, BoxLayout.Y_AXIS));
 		
-		panel_itemname.setPreferredSize(new Dimension(200, 25));
 		lbl_itemname.setFont(new Font("Arial", Font.PLAIN, 16));
+		
+		panel_itemname.setPreferredSize(new Dimension(200, 25));
 		panel_itemname.add(lbl_itemicon);
 		panel_itemname.add(name_separator);
 		panel_itemname.add(lbl_itemname);
@@ -104,6 +103,7 @@ public class ItemEdit {
 		
 		panel_iteminfo.setBorder(new LineBorder(Color.GRAY, 2, true));
 		panel_iteminfo.setLayout(new BoxLayout(panel_iteminfo, BoxLayout.Y_AXIS));
+		
 		lbl_totalcost.setFont(new Font("Arial", Font.PLAIN, 14));
 		lbl_totalvalue.setFont(new Font("Arial", Font.PLAIN, 14));
 		lbl_returns.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -125,7 +125,7 @@ public class ItemEdit {
 		frame.getContentPane().add(panel_buttons, BorderLayout.SOUTH);
 		
 		//Events
-		txt_cost.addFocusListener(new FocusAdapter() {
+		txt_cost.addFocusListener(new FocusAdapter() { //Check if new input is valid and revert to last valid value if it isn't
 			public void focusLost(FocusEvent e) {
 				double number = 0;
 				String last_number = Double.toString(item_cost);
@@ -171,7 +171,7 @@ public class ItemEdit {
 			}
 		});
 		
-		txt_quantity.addFocusListener(new FocusAdapter() {
+		txt_quantity.addFocusListener(new FocusAdapter() { //Check if new input is valid and revert to last valid value if it isn't
 			public void focusLost(FocusEvent e) {
 				int number = 0;
 				String last_number = Integer.toString(item_quantity);
@@ -207,7 +207,7 @@ public class ItemEdit {
 			}
 		});
 		
-		txt_expectedvalue.addFocusListener(new FocusAdapter() {
+		txt_expectedvalue.addFocusListener(new FocusAdapter() { //Check if new input is valid and add taxes to it, revert to last valid value if input wasn't valid
 			public void focusLost(FocusEvent e) {
 				double number = 0;
 				String last_number = Double.toString(item_expectedvalue);
@@ -244,7 +244,7 @@ public class ItemEdit {
 			}
 		});
 		
-		btn_accept.addMouseListener(new MouseAdapter() {
+		btn_accept.addMouseListener(new MouseAdapter() { //Check if all inputs are valid and proceed to save and make necessary changes
 			@Override
 			public void mousePressed(MouseEvent e) {
 				boolean can_continue = false;
@@ -266,14 +266,14 @@ public class ItemEdit {
 			}
 		});
 		
-		btn_cancel.addMouseListener(new MouseAdapter() {
+		btn_cancel.addMouseListener(new MouseAdapter() { //Form exit
 			@Override
 			public void mousePressed(MouseEvent e) {
 				close_form();
 			}
 		});
 		
-		frame.addWindowListener(new WindowAdapter() {
+		frame.addWindowListener(new WindowAdapter() { //Form close
             public void windowClosing(WindowEvent e) {
             	close_form();
             }
@@ -381,6 +381,10 @@ public class ItemEdit {
 	
 	public void set_item_table_row(int table_row) {
 		item_table_row = table_row;
+	}
+	
+	public void set_task_completed() {
+		task_done = false;
 	}
 	
 	public void set_item_icon(Object icon) {

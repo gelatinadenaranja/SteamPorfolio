@@ -18,7 +18,7 @@ public class Dbconnector {
 		Class.forName("org.sqlite.JDBC");
 		conn = DriverManager.getConnection("jdbc:sqlite:" + System.getProperty("user.home") + "\\SteamPortfolio\\data.db");
 		
-		}catch(Exception e){
+		} catch(Exception e) {
 			System.out.println(e);
 		}
 	}
@@ -31,10 +31,11 @@ public class Dbconnector {
 		ResultSet result;
 		int id; //Returned id is -1 if something fails.
 		
-		//Create a new id value for a new row.
+		//Create a new id value for a new item
 		try {
 			statement = conn.createStatement();
 			result = statement.executeQuery("SELECT MAX(id) FROM item_data;");
+			
 			if(!result.next()) {
 				id = 0;
 			} else {
@@ -46,7 +47,7 @@ public class Dbconnector {
 			return -1;
 		}
 		
-		//Inserting the new row into the database.
+		//Inserting the new item into the database.
 		try {
 			prep_statement = conn.prepareStatement("INSERT INTO item_data(id, name, name_count, market_link, game_id, market_hash_name, iconURL, " +
 					                                "cost, quantity, expected_value, " +
@@ -112,7 +113,6 @@ public class Dbconnector {
 	}
 	
 	public boolean create_tables() {
-		//Maybe normalize someday.
 		Statement statement = null;
 		
 		String query = "CREATE TABLE IF NOT EXISTS item_data(" +

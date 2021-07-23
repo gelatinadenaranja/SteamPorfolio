@@ -18,7 +18,8 @@ public class Settings {
 	private FileInputStream file_input;
 	private Properties setting;
 	
-	private int first_run;
+	//Settings
+	private int first_run; //Ever going to use this?
 	private int profit_mode;
 	private int currency;
 	private String currency_name;
@@ -27,7 +28,6 @@ public class Settings {
 		setting = new Properties();
 		
 		file = new File(System.getProperty("user.home") + "\\SteamPortfolio\\Settings.donottouch");
-		file.getParentFile().mkdir();
 		
 		create_directories();
 		create_currencies_file();
@@ -47,7 +47,7 @@ public class Settings {
 		}
 	}
 	
-	private void load_setting_values() {
+	private void load_setting_values() { //Read the settings file and load values
 		try{
 			first_run = Integer.parseInt(setting.getProperty("first_run"));
 			profit_mode = Integer.parseInt(setting.getProperty("profit_mode"));
@@ -57,7 +57,7 @@ public class Settings {
 			JOptionPane.showMessageDialog(null, "Why did you touch the settings?");
 			write_defaults();
 			
-			//Reload input stream
+			//Reload input stream after a default settings file is created
 			try{
 				file_input = new FileInputStream(file.getAbsoluteFile());
 				setting.load(file_input);
@@ -65,6 +65,7 @@ public class Settings {
 				JOptionPane.showMessageDialog(null, "Error:" + e1.toString());
 			}
 			
+			//Try loading setting values again
 			load_setting_values();
 		}
 	}

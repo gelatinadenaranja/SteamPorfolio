@@ -21,7 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import java.awt.Color;
 import javax.swing.JLabel;
-import java.awt.SystemColor;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -62,7 +61,6 @@ public class MainForm {
 	private JLabel lbl_totalcost;
 	private JLabel lbl_totalvalue;
 	private JLabel lbl_totalprofit;
-	private ButtonColumn btn_col;
 	
 	//Settings variables
 	private static Settings setting;
@@ -110,8 +108,8 @@ public class MainForm {
 	@SuppressWarnings("serial")
 	private void initialize() {
 		frame = new JFrame();
-		frame.getContentPane().setBackground(SystemColor.control);
 		frame.setBounds(100, 100, 1055, 500);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -127,7 +125,6 @@ public class MainForm {
 		
 		JMenuItem mntmAddItem = new JMenuItem("Add item");
 		mntmAddItem.setFont(new Font("Arial", Font.PLAIN, 12));
-		mntmAddItem.setIcon(null);
 		mnItem.add(mntmAddItem);
 		
 		JMenuItem mntmRemoveItem = new JMenuItem("Remove item");
@@ -138,30 +135,20 @@ public class MainForm {
 		mntmChangeCurrency.setFont(new Font("Arial", Font.PLAIN, 12));
 		mnSetting.add(mntmChangeCurrency);
 		
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
 		JButton btn_refresh = new JButton("Refresh");
 		btn_refresh.setForeground(Color.BLACK);
 		menuBar.add(btn_refresh);
 		
 		JPanel panelinfo = new JPanel();
 		panelinfo.setPreferredSize(new Dimension(10, 40));
-		panelinfo.setBackground(SystemColor.controlShadow);
-		frame.getContentPane().add(panelinfo, BorderLayout.SOUTH);
 		panelinfo.setLayout(new GridLayout(1, 0, 0, 0));
+		frame.getContentPane().add(panelinfo, BorderLayout.SOUTH);
 		
 		final JLabel lblCurrency = new JLabel("Currency: " + setting.get_currency_name());
 		lblCurrency.setBorder(new LineBorder(Color.BLACK, 2));
 		lblCurrency.setForeground(Color.BLACK);
 		lblCurrency.setFont(new Font("Arial", Font.PLAIN, 12));
 		panelinfo.add(lblCurrency);
-		
-		final JLabel lblKeyprice = new JLabel("Key price: ");
-		lblKeyprice.setBorder(new LineBorder(Color.BLACK, 2));
-		lblKeyprice.setBackground(SystemColor.menu);
-		lblKeyprice.setFont(new Font("Arial", Font.PLAIN, 12));
-		lblKeyprice.setForeground(Color.BLACK);
-		//panelinfo.add(lblKeyprice); //Not going to use this for now.
 		
 		lbl_totalcost = new JLabel("Total cost: ");
 		lbl_totalcost.setBorder(new LineBorder(Color.BLACK, 2));
@@ -242,7 +229,8 @@ public class MainForm {
 		    }
 		};
 		
-		btn_col = new ButtonColumn(main_data_container, view_item_info, 1);
+		@SuppressWarnings("unused")
+		ButtonColumn btn_col = new ButtonColumn(main_data_container, view_item_info, 1);
 		
 		main_data_container.getColumnModel().getColumn(0).setMinWidth(32);
 		main_data_container.getColumnModel().getColumn(0).setMaxWidth(32);
@@ -267,8 +255,7 @@ public class MainForm {
 	        }
 	    });
 		
-		additempopup_object.set_main_frame_source(frame);
-		
+		additempopup_object.set_mainform_frame(frame);
 		itemedit_object.set_mainform_frame(frame);
 		
 		//After all the UI elements have been initialized, retrieve saved data from db and insert it in the JTable.
@@ -323,7 +310,7 @@ public class MainForm {
 				   
 				   if( itemedit_object.get_task_done() ) {
 					   itemedit_object.set_task_completed();
-					   update_item();
+					   update_items();
 				   }
 			   }
 		});
@@ -393,7 +380,7 @@ public class MainForm {
 			}
 		});
 		
-		btn_refresh.addMouseListener(new MouseAdapter() { //Refresh item market data.
+		btn_refresh.addMouseListener(new MouseAdapter() { //Refresh JTable item market data.
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -584,7 +571,7 @@ public class MainForm {
 		}
 	}
 	
-	private void update_item() {
+	private void update_items() {
 		String id = "";
 		String name = itemedit_object.get_item_name();
 		double new_cost = itemedit_object.get_item_cost();
@@ -647,7 +634,6 @@ public class MainForm {
 	}
 	
 	private void update_total_profit() {
-		//-----------------------------------------------------------------------------------------------------------------------------------------
 		int quantity = 0;
 		double cost = 0;
 		double total_cost = 0;
