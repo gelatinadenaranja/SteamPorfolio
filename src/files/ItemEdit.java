@@ -55,7 +55,7 @@ public class ItemEdit {
 	private double item_expectedvalue = 0;
 	private double item_price = 0;
 	private int item_quantity = 0;
-	private int item_table_row = 0;
+	private int table_row_num = 0; //Stores the current row number of the selected item
 	private boolean task_done = false;
 	
 	public ItemEdit() {
@@ -354,8 +354,8 @@ public class ItemEdit {
 		return task_done;
 	}
 	
-	public int get_item_table_row() {
-		return item_table_row;
+	public int get_table_row_num() {
+		return table_row_num;
 	}
 	
 	public String get_item_name() {
@@ -379,8 +379,8 @@ public class ItemEdit {
 		mainform_frame = frame;
 	}
 	
-	public void set_item_table_row(int table_row) {
-		item_table_row = table_row;
+	public void set_table_row_num(int row_num) {
+		table_row_num = row_num;
 	}
 	
 	public void set_task_completed() {

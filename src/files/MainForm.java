@@ -1,8 +1,6 @@
 package files;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,7 +8,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.JViewport;
 
 import java.awt.Font;
@@ -22,7 +19,6 @@ import javax.swing.JPanel;
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.Dimension;
 import javax.swing.ScrollPaneConstants;
@@ -37,7 +33,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.BorderLayout;
@@ -54,10 +49,8 @@ public class MainForm {
 	
 	//GUI misc
 	private JFrame frame;
-	private JTable main_data_container;
-	private DefaultTableModel table_model;
+	private static ItemTable table_manager;
 	private static Additempopup additempopup_object;
-	private static ItemEdit itemedit_object;
 	private JLabel lbl_totalcost;
 	private JLabel lbl_totalvalue;
 	private JLabel lbl_totalprofit;
@@ -74,9 +67,9 @@ public class MainForm {
 	
 	/*Launch the application.*/
 	public static void main(String[] args) {
-		additempopup_object = new Additempopup();
+		table_manager = new ItemTable();
 		
-		itemedit_object = new ItemEdit();
+		additempopup_object = new Additempopup();
 		
 		itemname_id_list = new TreeMap<String, String>();
 		
@@ -110,6 +103,9 @@ public class MainForm {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1055, 500);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		additempopup_object.set_mainform_frame(frame);
+		table_manager.set_mainform_frame(frame);
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -168,83 +164,7 @@ public class MainForm {
 		lbl_totalprofit.setFont(new Font("Arial", Font.PLAIN, 12));
 		panelinfo.add(lbl_totalprofit);
 		
-		table_model = new DefaultTableModel();
-		table_model.addColumn("");
-		table_model.addColumn("Item");
-		table_model.addColumn("Quantity");
-		table_model.addColumn("Cost");
-		table_model.addColumn("Profit (%)");
-		table_model.addColumn("<html>Expected value<br>(Tax)");
-		table_model.addColumn("<html>Lowest price<br>(Tax)");
-		table_model.addColumn("<html>Median price<br>(Tax)");
-    	table_model.addColumn("Volume");
-    	
-		main_data_container = new JTable(table_model) {
-			 public boolean getScrollableTracksViewportWidth() {
-				   return getPreferredSize().width < getParent().getWidth();
-			 }
-			 
-			 public void changeSelection( int row, int col, boolean toggle, boolean expand ) {
-			     if( col == 1) {
-			    	 super.changeSelection( row, col, true, expand );
-			     }
-			}
-			 
-			public boolean isCellEditable(int row, int column) {
-				return column == 1;
-			}
-			
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			@Override
-			public Class getColumnClass(int column) {
-				switch(column) {
-				case 0:
-					return ImageIcon.class;
-				
-				default:
-					return String.class;
-					//return getValueAt(0, column).getClass(); //Old
-				}
-            }
-		};
-		
-		main_data_container.setFocusable(true);
-		main_data_container.setRowSelectionAllowed(false);
-		main_data_container.getTableHeader().setReorderingAllowed(false);
-		main_data_container.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		main_data_container.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-		main_data_container.setRowHeight(30);
-		
-		Action view_item_info = new AbstractAction() { //Column button event
-		    public void actionPerformed(ActionEvent e) {
-		    	int selected_item_row = Integer.valueOf(e.getActionCommand());
-		    	itemedit_object.set_item_icon(main_data_container.getValueAt(selected_item_row, 0));
-		    	itemedit_object.set_item_name(table_model.getValueAt(selected_item_row, 1).toString());
-		    	itemedit_object.set_item_cost(Double.parseDouble(table_model.getValueAt(selected_item_row, 3).toString()));
-		    	itemedit_object.set_item_expectedvalue(Double.parseDouble(table_model.getValueAt(selected_item_row, 5).toString()));
-		    	itemedit_object.set_item_price(Double.parseDouble(table_model.getValueAt(selected_item_row, 6).toString()));
-		    	itemedit_object.set_item_quantity(Integer.parseInt(table_model.getValueAt(selected_item_row, 2).toString()));
-		    	itemedit_object.set_item_table_row(selected_item_row);
-		    	itemedit_object.set_form_visible();
-		    }
-		};
-		
-		@SuppressWarnings("unused")
-		ButtonColumn btn_col = new ButtonColumn(main_data_container, view_item_info, 1);
-		
-		main_data_container.getColumnModel().getColumn(0).setMinWidth(32);
-		main_data_container.getColumnModel().getColumn(0).setMaxWidth(32);
-		main_data_container.getColumnModel().getColumn(0).setResizable(false);
-		main_data_container.getColumnModel().getColumn(1).setMinWidth(320);
-		main_data_container.getColumnModel().getColumn(2).setMinWidth(70);
-		main_data_container.getColumnModel().getColumn(3).setMinWidth(100);
-		main_data_container.getColumnModel().getColumn(4).setMinWidth(100);
-		main_data_container.getColumnModel().getColumn(5).setMinWidth(100);
-		main_data_container.getColumnModel().getColumn(6).setMinWidth(100);
-		main_data_container.getColumnModel().getColumn(7).setMinWidth(100);
-		main_data_container.getColumnModel().getColumn(8).setMinWidth(100);
-		
-		JScrollPane scroll_pane = new JScrollPane (main_data_container);
+		JScrollPane scroll_pane = new JScrollPane (table_manager.get_jtable());
 		scroll_pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll_pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		frame.getContentPane().add(scroll_pane);
@@ -254,9 +174,6 @@ public class MainForm {
 	          return dim;
 	        }
 	    });
-		
-		additempopup_object.set_mainform_frame(frame);
-		itemedit_object.set_mainform_frame(frame);
 		
 		//After all the UI elements have been initialized, retrieve saved data from db and insert it in the JTable.
 		ArrayList<ArrayList<String>> table_row_list = new ArrayList<ArrayList<String>>();
@@ -275,7 +192,7 @@ public class MainForm {
 			}
 			
 			//Add the new row.
-			table_model.addRow(new Object[] { icon,
+			table_manager.add_new_row(icon,
 					element.get(1),
 					element.get(2),
 					element.get(3),
@@ -283,7 +200,7 @@ public class MainForm {
 					element.get(5),
 					element.get(6),
 					element.get(7),
-					element.get(8)});
+					element.get(8));
 			
 			//Fill the itemname_id_list map
 			itemname_id_list.put(element.get(1), element.get( element.size() - 1 ));
@@ -308,9 +225,9 @@ public class MainForm {
 					   add_new_item();
 				   }
 				   
-				   if( itemedit_object.get_task_done() ) {
-					   itemedit_object.set_task_completed();
-					   update_items();
+				   if( table_manager.get_item_got_edited() ) {
+					   table_manager.set_item_got_edited();
+					   update_item();
 				   }
 			   }
 		});
@@ -348,13 +265,13 @@ public class MainForm {
 					if(success) {
 						int row_index;
 						
-						for(row_index=0; row_index < table_model.getRowCount(); row_index++) {
-							if(table_model.getValueAt(row_index, 1).equals(selected_item)) {
+						for(row_index=0; row_index < table_manager.get_row_count(); row_index++) {
+							if(table_manager.get_cell_value(row_index, 1).equals(selected_item)) {
 								break;
 							}
 						}
 						
-						table_model.removeRow(row_index);
+						table_manager.remove_row(row_index);
 						itemname_id_list.remove(selected_item);
 						update_all_totals();
 					}
@@ -447,8 +364,8 @@ public class MainForm {
 							
 							//Find the item's row.
 							int index;
-							for(index = 0; index < table_model.getRowCount(); index++) {
-								if(item_name.equals(table_model.getValueAt(index, 1))) {
+							for(index = 0; index < table_manager.get_row_count(); index++) {
+								if( item_name.equals(table_manager.get_cell_value(index, 1)) ) {
 									item_row = index;
 									break;
 								}
@@ -456,7 +373,7 @@ public class MainForm {
 							
 							//Calculate new profit value.
 							try {
-								item_cost = Double.parseDouble(table_model.getValueAt(item_row, 3).toString());
+								item_cost = Double.parseDouble(table_manager.get_cell_value(item_row, 3).toString());
 							} catch(NumberFormatException ex) {
 								item_cost = 0;
 							}
@@ -464,10 +381,7 @@ public class MainForm {
 							
 							//Insert the new data into the cells.
 							if (item_row > -1) {
-								table_model.setValueAt(item_profit, item_row, 4);
-								table_model.setValueAt(lowest_price, item_row, 6);
-								table_model.setValueAt(median_price, item_row, 7);
-								table_model.setValueAt(volume, item_row, 8);
+								table_manager.refresh_item_market_data(item_row, item_profit, lowest_price, median_price, volume);
 							}
 						} while(data.next());
 					}
@@ -557,51 +471,43 @@ public class MainForm {
 			
 			itemname_id_list.put(item_name, Integer.toString(item_id));
 			
-			table_model.addRow(new Object[] { item_icon,
+			table_manager.add_new_row(item_icon,
 					item_name,
-					item_quantity,
-					item_cost,
+					Integer.toString(item_quantity),
+					Double.toString(item_cost),
 					item_profit,
-					item_expected_value_tax,
+					Double.toString(item_expected_value_tax),
 					item_lowest_price,
 					item_median_price,
-					item_volume});
+					item_volume);
 			
 			update_all_totals();
 		}
 	}
 	
-	private void update_items() {
-		String id = "";
-		String name = itemedit_object.get_item_name();
-		double new_cost = itemedit_object.get_item_cost();
-		double new_expectedvalue = itemedit_object.get_item_expectedvalue();
-		int new_quantity = itemedit_object.get_item_quantity();
-		boolean success;
-		int table_row_num = itemedit_object.get_item_table_row();
+	private void update_item() {
+		int table_row_num = table_manager.apply_item_edits();
 		
-		//Getting the item's id by its name in the map.
+		String id = "";
+		String item_name = table_manager.get_cell_value(table_row_num, 1).toString();
+		String new_cost = table_manager.get_cell_value(table_row_num, 3).toString();
+		String new_quantity = table_manager.get_cell_value(table_row_num, 2).toString();
+		String new_expectedvalue = table_manager.get_cell_value(table_row_num, 5).toString();
+		
+		
+		//Getting the item's id by its name in the map
 		for(Map.Entry<String, String> map : itemname_id_list.entrySet()) {
-			if( name.equals(map.getKey()) ) {
+			if( item_name.equals(map.getKey()) ) {
 				id = map.getValue();
 				break;
 			}
 		}
 		
-		//Updating database row.
-		success = database_manager.update_item_data( id, Double.toString(new_cost), Integer.toString(new_quantity), Double.toString(new_expectedvalue) );
+		//Updating database row
+		database_manager.update_item_data( id, new_cost, new_quantity, new_expectedvalue );
 		
-		//Update JTable on success.
-		if(success) {
-			String new_profit = profit_calc( new_cost, table_model.getValueAt(table_row_num, 6).toString() );
-			
-			table_model.setValueAt(new_quantity, table_row_num, 2);
-			table_model.setValueAt(new_cost, table_row_num, 3);
-			table_model.setValueAt(new_profit , table_row_num, 4);
-			table_model.setValueAt(new_expectedvalue, table_row_num, 5);
-			
-			update_all_totals();
-		}
+		//Update labels
+		update_all_totals();
 	}
 	//Total value and profit
 	private void update_total_cost() {
@@ -609,9 +515,9 @@ public class MainForm {
 		double cost = 0;
 		double total_cost = 0;
 		
-		for(int index = 0; index < table_model.getRowCount(); index++) {
-			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
-			cost = Double.parseDouble( table_model.getValueAt(index, 3).toString() );
+		for(int index = 0; index < table_manager.get_row_count(); index++) {
+			quantity = Integer.parseInt ( table_manager.get_cell_value(index, 2).toString() );
+			cost = Double.parseDouble( table_manager.get_cell_value(index, 3).toString() );
 			total_cost = total_cost + (quantity * cost);
 		}
 		
@@ -623,9 +529,9 @@ public class MainForm {
 		double price = 0;
 		double total_value = 0;
 		
-		for(int index = 0; index < table_model.getRowCount(); index++) {
-			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
-			price = Double.parseDouble( table_model.getValueAt(index, 6).toString() );
+		for(int index = 0; index < table_manager.get_row_count(); index++) {
+			quantity = Integer.parseInt ( table_manager.get_cell_value(index, 2).toString() );
+			price = Double.parseDouble( table_manager.get_cell_value(index, 6).toString() );
 			price = price * 0.8695;
 			total_value = total_value + (quantity * price);
 		}
@@ -641,10 +547,10 @@ public class MainForm {
 		double total_value = 0;
 		double total_profit = 0;
 		
-		for(int index = 0; index < table_model.getRowCount(); index++) {
-			quantity = Integer.parseInt ( table_model.getValueAt(index, 2).toString() );
-			cost = Double.parseDouble( table_model.getValueAt(index, 3).toString() );
-			price = Double.parseDouble( table_model.getValueAt(index, 6).toString() );
+		for(int index = 0; index < table_manager.get_row_count(); index++) {
+			quantity = Integer.parseInt ( table_manager.get_cell_value(index, 2).toString() );
+			cost = Double.parseDouble( table_manager.get_cell_value(index, 3).toString() );
+			price = Double.parseDouble( table_manager.get_cell_value(index, 6).toString() );
 			price = price * 0.8695;
 			
 			total_value = total_value + (quantity * price);
@@ -713,7 +619,7 @@ public class MainForm {
 			profit_value = truncate(profit_value);
 			return String.valueOf(profit_value) + '%';
 		default:
-			JOptionPane.showMessageDialog(null, "An invalid profit display mode has been selected.\nSwitching to default.");
+			JOptionPane.showMessageDialog(null, "An invalid profit display mode has been selected.\nSwitched to default.");
 			profit_mode = 0;
 			profit_value =  ((price * 100) / cost) - 100;
 			profit_value = truncate(profit_value);
