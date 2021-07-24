@@ -12,4 +12,3 @@ For more information about these kind of investments visit the [CS:GO Steam Mark
 - Dbconnector: Manage all database interactions.
 - Settings: Read and write the program's settings.
 - ButtonColumn: Allow usage of buttons in JTable.
-- Itemaddform: Test class, forgot to move it.
