@@ -329,7 +329,7 @@ public class MainForm {
 							item_id = data.getString("id");
 							
 							
-							//Check if data has been gotten.
+							//Check if data has been gotten
 							match = false;
 							for(String[] element : market_data) {
 								if(element[0].equals(hash_name) && element[1].equals(game_id)) {
@@ -341,7 +341,7 @@ public class MainForm {
 								}
 							}
 							
-							//Get market data if it wasn't in the list.
+							//Get market data if it wasn't in the list
 							if(match == false) {
 								String[] item_market_data;
 								
@@ -362,16 +362,10 @@ public class MainForm {
 								}
 							}
 							
-							//Find the item's row.
-							int index;
-							for(index = 0; index < table_manager.get_row_count(); index++) {
-								if( item_name.equals(table_manager.get_cell_value(index, 1)) ) {
-									item_row = index;
-									break;
-								}
-							}
+							//Find the item's row
+							item_row = table_manager.find_item_row(item_name);
 							
-							//Calculate new profit value.
+							//Calculate new profit value
 							try {
 								item_cost = Double.parseDouble(table_manager.get_cell_value(item_row, 3).toString());
 							} catch(NumberFormatException ex) {
@@ -379,7 +373,7 @@ public class MainForm {
 							}
 							String item_profit = profit_calc(item_cost, lowest_price);
 							
-							//Insert the new data into the cells.
+							//Insert the new data into the cells
 							if (item_row > -1) {
 								table_manager.refresh_item_market_data(item_row, item_profit, lowest_price, median_price, volume);
 							}
@@ -435,7 +429,7 @@ public class MainForm {
 		
 		item_expected_value_tax = add_tax(item_expected_value);
 		
-		icon_URL = System.getProperty("user.home") + "\\SteamPortfolio\\icons\\" + item_market_hash_name + ".png";
+		icon_URL = System.getProperty("user.home") + "\\SteamPortfolio\\icons\\" + item_market_hash_name + ".png"; //While a file with this URL doesn't exist, the default item icon will be used
 		
 		if(additempopup_object.get_item_icon() == null) {
 			item_icon = get_default_icon();
@@ -446,7 +440,6 @@ public class MainForm {
 				ImageIO.write(additempopup_object.get_item_icon(), "png", new File(icon_URL));
 			} catch (IOException e1) {
 				JOptionPane.showMessageDialog(null, "Couldn't save item icon.\n" + e1.toString());
-				icon_URL = null;
 			}
 		}
 		
