@@ -6,11 +6,10 @@ For more information about these kind of investments visit the [CS:GO Steam Mark
   
 ## Classes' short description of their role
 - MainForm: Initialize the main panel from which the user manages their items.
+- ItemTable: Manages all interactions with the JTable that displays the data.
 - Additempopup: Create a panel used for adding new items.
+- ItemEdit: Creates a panel used for editing existing items.
 - Dbconnector: Manage all database interactions.
 - Settings: Read and write the program's settings.
 - ButtonColumn: Allow usage of buttons in JTable.
 - Itemaddform: Test class, forgot to move it.
-  
-    
-  Note: Everything in the folder *testclasses* is, indeed, used **ONLY** for testing purposes. All that code is a mess that doesn't make sense, ignore it.
