@@ -1,5 +1,7 @@
 package files;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 
@@ -9,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class ItemTable {
@@ -73,12 +76,19 @@ public class ItemTable {
 		main_data_container.getColumnModel().getColumn(0).setResizable(false);
 		main_data_container.getColumnModel().getColumn(1).setMinWidth(320);
 		main_data_container.getColumnModel().getColumn(2).setMinWidth(70);
+		main_data_container.getColumnModel().getColumn(2).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(3).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(3).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(4).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(4).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(5).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(5).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(6).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(6).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(7).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(7).setCellRenderer(new CustomCellRenderer());
 		main_data_container.getColumnModel().getColumn(8).setMinWidth(100);
+		main_data_container.getColumnModel().getColumn(8).setCellRenderer(new CustomCellRenderer());
 		
 		//Events
 		@SuppressWarnings("serial")
@@ -97,6 +107,41 @@ public class ItemTable {
 		};
 		@SuppressWarnings("unused")
 		ButtonColumn btn_col = new ButtonColumn(main_data_container, view_item_info, 1);
+	}
+	
+	@SuppressWarnings("serial")
+	private class CustomCellRenderer extends DefaultTableCellRenderer {
+		
+		@Override
+	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			
+			if ((column%2) == 0) {
+				setBackground(Color.WHITE);
+			} else {
+				setBackground( new Color(191, 205, 219) ); //Make a bit lighter
+			}
+			
+			String text_value = value.toString();
+			if( (text_value == null) || (text_value.length() < 0) ) {
+				return this;
+			}
+			
+			if( column == 4 ) {
+				if(text_value.charAt(0) == '-') {
+					setForeground(Color.RED);
+				} else {
+					setForeground(Color.GREEN); //Change to a darker tone
+				}
+				
+			} else if( (column == 6) || (column == 7) || (column == 8) ) {
+				if(text_value.charAt(0) == '!') {
+					setForeground(Color.YELLOW); //Change to a darker tone
+				}
+			}
+			
+	        return this;
+	    }
 	}
 	
 	public void add_new_row(ImageIcon icon, String name, String quantity, String cost, String profit, String expected_value, 

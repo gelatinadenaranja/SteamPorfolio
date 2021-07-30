@@ -162,7 +162,7 @@ public class Dbconnector {
 		PreparedStatement prep_statement;
 		ResultSet result;
 		
-		String query = "SELECT id, name, name_count, quantity, cost, iconURL, expected_value, game_id, market_hash_name FROM item_data;";
+		String query = "SELECT id, name, name_count, quantity, cost, iconURL, expected_value, game_id, market_hash_name FROM item_data ORDER BY name ASC;";
 		
 		try{
 			prep_statement = conn.prepareStatement(query);
