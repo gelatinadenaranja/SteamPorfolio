@@ -639,7 +639,7 @@ public class MainForm {
 		JSONParser jsonparser = new JSONParser();
 		JSONObject obj = null;
 		String json;
-		String[] values = {"0", "0", "0"};;
+		String[] values = {"0", "0", "0"};
 		
 		//Getting the JSON
 		try {
